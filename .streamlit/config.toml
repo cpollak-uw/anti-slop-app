@@ -1,4 +1,4 @@
-```toml
+toml
 [theme]
 base = "light"
 primaryColor = "#6b5030"
@@ -14,4 +14,3 @@ backgroundColor = "#ede8de"
 
 [client]
 toolbarMode = "minimal"
-```

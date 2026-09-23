@@ -1,7 +1,7 @@
 import streamlit as st
 
 from content.genre_exercises import CITATIONS, GENRES, INTRO
-from utils.downloads import build_docx
+from utils.downloads import PAGE_NOTE, build_docx, save_section
 from utils.exercise import locked_choice, model_answer, passage, response_box
 from utils.style import banner, label
 
@@ -14,6 +14,7 @@ st.caption(INTRO)
 with st.expander("Sources for this exercise set"):
     for c in CITATIONS:
         st.caption(c)
+st.info(PAGE_NOTE, icon=":material/save:")
 
 
 def rank_exercise(key, ex):
@@ -75,20 +76,29 @@ for g, tab in zip(GENRES, tabs):
                 elif ex["type"] == "rank":
                     rank_exercise(key, ex)
 
-st.subheader("Save your work")
-st.caption("This app doesn't store anything you type. Download your rewrites before you leave.")
-name = st.text_input("Your name (appears on the downloaded file)", key="student_name")
-sections = []
-for g in GENRES:
-    for i, ex in enumerate(g["exercises"]):
-        if ex["type"] in ("transform", "spotfix"):
-            resp = st.session_state.get(f"s2_{g['id']}_{i}_resp", "") or "(no response)"
-            sections.append((f"{g['label']}, Exercise {i + 1}: {ex['question']}",
-                             f"Original: {ex['passage']}\n\nMy version: {resp}"))
-st.download_button(
-    "Download as Word document",
-    data=build_docx("Exercise Set 2: Writing in a More Human Style", name, sections),
+WRITING_KEYS = [f"s2_{g['id']}_{i}_resp"
+                for g in GENRES
+                for i, ex in enumerate(g["exercises"])
+                if ex["type"] in ("transform", "spotfix")]
+
+
+def build(name):
+    sections = []
+    for g in GENRES:
+        for i, ex in enumerate(g["exercises"]):
+            if ex["type"] in ("transform", "spotfix"):
+                resp = st.session_state.get(f"s2_{g['id']}_{i}_resp", "") or "(no response)"
+                sections.append((f"{g['label']}, Exercise {i + 1}: {ex['question']}",
+                                 f"Original: {ex['passage']}\n\nMy version: {resp}"))
+    return build_docx("Exercise Set 2: Writing in a More Human Style", name, sections)
+
+
+save_section(
+    key_prefix="s2",
+    name_label="Your name (appears on the downloaded file)",
+    field_keys=WRITING_KEYS,
+    build=build,
     file_name="ExerciseSet2_responses.docx",
-    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    icon=":material/download:", type="primary",
+    extra_note="The counter covers the writing boxes in all three genre tabs, not only the "
+               "tab you have open.",
 )

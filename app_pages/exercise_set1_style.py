@@ -2,7 +2,7 @@ import streamlit as st
 
 from content.reading_check import CITATIONS
 from content.style_comparison import EXERCISES, EXERCISES_INTRO, PARAGRAPHS, PARAGRAPHS_INTRO
-from utils.downloads import build_docx
+from utils.downloads import PAGE_NOTE, build_docx, save_section
 from utils.exercise import HL_CSS, highlight, locked_choice, model_answer, passage, response_box
 from utils.style import banner, label
 
@@ -14,6 +14,7 @@ banner(
 with st.expander("Sources for this exercise set"):
     for c in CITATIONS:
         st.caption(c)
+st.info(PAGE_NOTE, icon=":material/save:")
 
 tab_paras, tab_ex = st.tabs(["Paragraph examples", "Exercises"])
 
@@ -68,18 +69,21 @@ with tab_ex:
                 response_box(f"s1_resp{i}", "Type your rewritten sentence here…")
                 model_answer(ex["model"])
 
-    st.subheader("Save your work")
-    st.caption("This app doesn't store anything you type. Download your rewrites before you leave.")
-    name = st.text_input("Your name (appears on the downloaded file)", key="student_name")
-    sections = []
-    for i, ex in enumerate(EXERCISES):
-        if ex["type"] == "transform":
-            sections.append((f"Exercise {i + 1}: {ex['question']}", f"Original: {ex['passage']}\n\n"
-                             f"My version: {st.session_state.get(f's1_resp{i}', '') or '(no response)'}"))
-    st.download_button(
-        "Download as Word document",
-        data=build_docx("Exercise Set 1: AI Slop Style vs. a More Human Style", name, sections),
+    def build(name):
+        sections = []
+        for i, ex in enumerate(EXERCISES):
+            if ex["type"] == "transform":
+                sections.append((f"Exercise {i + 1}: {ex['question']}",
+                                 f"Original: {ex['passage']}\n\n"
+                                 f"My version: {st.session_state.get(f's1_resp{i}', '') or '(no response)'}"))
+        return build_docx("Exercise Set 1: AI Slop Style vs. a More Human Style", name, sections)
+
+    save_section(
+        key_prefix="s1",
+        name_label="Your name (appears on the downloaded file)",
+        field_keys=[f"s1_resp{i}" for i, ex in enumerate(EXERCISES) if ex["type"] == "transform"],
+        build=build,
         file_name="ExerciseSet1_responses.docx",
-        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        icon=":material/download:", type="primary",
+        extra_note="Only the transformation exercises have boxes to write in, so the counter "
+                   "covers those.",
     )

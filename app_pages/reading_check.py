@@ -1,7 +1,7 @@
 import streamlit as st
 
 from content.reading_check import CITATIONS, DISCUSSION_PROMPTS, INTRO, QUESTIONS
-from utils.downloads import build_docx
+from utils.downloads import PAGE_NOTE, build_docx, save_section
 from utils.style import banner, label
 
 LETTERS = ["a", "b", "c", "d"]
@@ -19,6 +19,7 @@ with st.container(border=True):
     st.write(INTRO)
     for c in CITATIONS:
         st.caption(c)
+st.info(PAGE_NOTE, icon=":material/save:")
 
 # ── Part A: quiz ─────────────────────────────────────────────────────────────
 st.header("Part A · Comprehension questions")
@@ -100,25 +101,21 @@ for i, prompt in enumerate(DISCUSSION_PROMPTS):
                      placeholder="Your notes…")
 
 # ── Download ─────────────────────────────────────────────────────────────────
-st.header("Save your work")
-st.caption(
-    "This app doesn't store anything you type. Download your score and notes before you "
-    "close the tab or the page reloads."
-)
-name = st.text_input("Your name (appears on the downloaded file)", key="student_name")
+def build(name):
+    sections = [("Quiz score", f"{score} / {N} ({answered_count} of {N} answered)")]
+    for i, prompt in enumerate(DISCUSSION_PROMPTS):
+        plain = prompt.replace("*", "")
+        sections.append((f"Prompt {i + 1}: {plain}", st.session_state.get(f"rc_note{i}", "")))
+    return build_docx("Reading Check: How LLMs Actually Write", name, sections)
 
-sections = [("Quiz score", f"{score} / {N} ({answered_count} of {N} answered)")]
-for i, prompt in enumerate(DISCUSSION_PROMPTS):
-    plain = prompt.replace("*", "")
-    sections.append((f"Prompt {i + 1}: {plain}", st.session_state.get(f"rc_note{i}", "")))
 
-st.download_button(
-    "Download as Word document",
-    data=build_docx("Reading Check: How LLMs Actually Write", name, sections),
+save_section(
+    key_prefix="rc",
+    name_label="Your name (appears on the downloaded file)",
+    field_keys=[f"rc_note{i}" for i in range(len(DISCUSSION_PROMPTS))],
+    build=build,
     file_name="ReadingCheck_notes.docx",
-    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    icon=":material/download:",
-    type="primary",
+    extra_note="Your quiz score goes into the file as well.",
 )
 
 st.divider()

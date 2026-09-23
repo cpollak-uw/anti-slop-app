@@ -4,6 +4,8 @@ This is the file Streamlit runs. It sets up the page list and the sidebar
 navigation. Each page's content lives in the app_pages/ folder.
 """
 
+from pathlib import Path
+
 import streamlit as st
 
 from utils.style import inject_css
@@ -15,13 +17,14 @@ st.set_page_config(
 )
 inject_css()
 
-# Setup check: if the hidden .streamlit/config.toml file didn't make it to GitHub,
-# the app still works but loses its colors and fonts. Say so, so it's easy to notice.
-if st.get_option("theme.primaryColor") is None:
+# Setup check: look for the settings file itself, next to this script. Checking the
+# theme values instead gave a false alarm on Streamlit Community Cloud, which supplies
+# its own theme defaults.
+if not (Path(__file__).parent / ".streamlit" / "config.toml").is_file():
     st.warning(
         "Setup note for the instructor: the color and font settings file "
         "(.streamlit/config.toml) is missing, so the app is using Streamlit's default look. "
-        "See step 3 in the README to add it. This note disappears once the file is in place.",
+        "See step 4 in the README to add it. This note disappears once the file is in place.",
         icon=":material/palette:",
     )
 

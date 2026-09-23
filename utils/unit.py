@@ -19,6 +19,7 @@ import streamlit as st
 from docx import Document
 from docx.shared import Pt
 
+from utils.downloads import PAGE_NOTE, save_section
 from utils.style import banner, label
 
 
@@ -69,8 +70,21 @@ def _render_block(unit, b):
                     st.caption(f["hint"])
 
 
+def writing_keys(unit):
+    """Every text box on the page, in order, for the 'boxes filled' counter."""
+    keys = []
+    for part in unit["parts"]:
+        for b in part["blocks"]:
+            if b["type"] in ("prompt", "audit"):
+                keys.append(_k(unit, b["id"]))
+            elif b["type"] == "star":
+                keys += [_k(unit, b["id"], f["id"]) for f in b["fields"]]
+    return keys
+
+
 def render_unit(unit):
     banner(unit["kicker"], unit["title"], unit["sub"])
+    st.info(PAGE_NOTE, icon=":material/save:")
 
     with st.container(border=True):
         st.markdown(unit["goals_intro"])
@@ -88,20 +102,13 @@ def render_unit(unit):
         label(unit["deliver_label"])
         st.markdown("\n".join(f"- {d}" for d in unit["deliver"]))
 
-    st.header("Save your work")
-    st.caption(
-        "This app doesn't store anything you type, and your answers disappear if you close the tab "
-        "or reload the page. Download them as a Word file before you leave, and download again "
-        "whenever you've added more."
-    )
-    names = st.text_input(unit["name_label"], key=f"{unit['key']}_names")
-    st.download_button(
-        "Download my work as a Word document",
-        data=build_unit_docx(unit, names),
+    save_section(
+        key_prefix=unit["key"],
+        name_label=unit["name_label"],
+        field_keys=writing_keys(unit),
+        build=lambda names: build_unit_docx(unit, names),
         file_name=unit["file_name"],
-        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        icon=":material/download:",
-        type="primary",
+        extra_note="Your checklist boxes go into the file as well, marked checked or unchecked.",
     )
 
     st.divider()

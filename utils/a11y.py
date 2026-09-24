@@ -13,6 +13,8 @@ only and never moves or deletes an element, so React keeps control of the DOM.
 
 import streamlit.components.v1 as components
 
+from utils.style import palette
+
 _SCRIPT = """
 <script>
 let doc = null;
@@ -91,11 +93,12 @@ function report(missing) {
   if (!SHOW_STATUS || !document.body) return;
   document.body.style.margin = '0';
   document.body.innerHTML =
-    '<div style="padding:12px 16px;border-left:5px solid;border-top:1px solid #8f816c;' +
-    'border-right:1px solid #8f816c;border-bottom:1px solid #8f816c;' +
+    '<div style="padding:12px 16px;border-left:5px solid;border-top:1px solid;' +
+    'border-right:1px solid;border-bottom:1px solid;' +
     'font-family:Georgia,serif;font-size:0.95rem;line-height:1.6;' +
-    'background:#ffffff;color:#1a1410;' +
-    (missing.length ? 'border-color:#9b2c2c;"' : 'border-color:#1d6b43;"') + '>' +
+    'background:BOX_SURFACE;color:BOX_TEXT;border-top-color:BOX_BORDER;' +
+    'border-right-color:BOX_BORDER;border-bottom-color:BOX_BORDER;' +
+    (missing.length ? 'border-left-color:BOX_NO;"' : 'border-left-color:BOX_OK;"') + '>' +
     (missing.length
       ? '<strong>Accessibility check: FAILED.</strong> Could not find ' + state +
         '. The screen reader fixes are not being applied, so Streamlit has probably ' +
@@ -130,7 +133,13 @@ def patch_streamlit_a11y(show_status: bool = False):
     release notes, open the app with ?check=1 on the end of its address and the app
     tells you whether the fixes still apply to the Streamlit it is running on.
     """
+    pal = palette()
     script = _SCRIPT.replace("SHOW_STATUS", "true" if show_status else "false")
+    # The status box lives inside its own frame, so it cannot inherit the app's CSS
+    # and takes the palette's colors directly.
+    for token, key in (("BOX_SURFACE", "SURFACE"), ("BOX_TEXT", "TEXT"),
+                       ("BOX_BORDER", "BORDER"), ("BOX_OK", "OK"), ("BOX_NO", "NO")):
+        script = script.replace(token, pal[key])
     if show_status:
         # Full width, or the box is drawn in a frame nobody can see.
         components.html(script, height=130)

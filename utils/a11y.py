@@ -15,13 +15,24 @@ import streamlit.components.v1 as components
 
 _SCRIPT = """
 <script>
-const doc = window.parent.document;
+let doc = null;
+let blocked = false;
+try {
+  doc = window.parent.document;
+  if (!doc) blocked = true;
+} catch (e) {
+  // If the browser ever refuses access to the page from this frame, the fixes
+  // cannot be applied at all, and the status box should say so rather than
+  // leaving a blank space.
+  blocked = true;
+}
 let lastReport = null;   // declared before patch() runs, not after
 
 // Each fix records whether it found the element it was looking for. If Streamlit
 // renames one of these test IDs in a future release, the count of misses is what
 // tells us, rather than the page quietly losing a landmark.
 function patch() {
+  if (blocked) { report(['the page itself (this browser blocked access to it)']); return; }
   const missing = [];
 
   // 1. The sidebar is a <section> with aria-expanded, which that role does not allow.
@@ -80,10 +91,11 @@ function report(missing) {
   if (!SHOW_STATUS || !document.body) return;
   document.body.style.margin = '0';
   document.body.innerHTML =
-    '<div style="padding:12px 16px;border-left:4px solid;font-family:Georgia,serif;' +
-    'font-size:0.95rem;line-height:1.6;' +
-    (missing.length ? 'background:#fce8e8;border-color:#9c3a3a;color:#5a1a1a;"'
-                    : 'background:#e8f4ee;border-color:#4a8c5c;color:#1a3a28;"') + '>' +
+    '<div style="padding:12px 16px;border-left:5px solid;border-top:1px solid #8f816c;' +
+    'border-right:1px solid #8f816c;border-bottom:1px solid #8f816c;' +
+    'font-family:Georgia,serif;font-size:0.95rem;line-height:1.6;' +
+    'background:#ffffff;color:#1a1410;' +
+    (missing.length ? 'border-color:#9b2c2c;"' : 'border-color:#1d6b43;"') + '>' +
     (missing.length
       ? '<strong>Accessibility check: FAILED.</strong> Could not find ' + state +
         '. The screen reader fixes are not being applied, so Streamlit has probably ' +
@@ -97,6 +109,7 @@ function report(missing) {
 function start() {
   lastReport = null;   // make sure the status box is drawn on this pass
   patch();
+  if (blocked) return;
   // Streamlit rebuilds parts of the page as students answer questions, so re-apply.
   new MutationObserver(patch).observe(doc.body, {childList: true, subtree: true});
 }
@@ -118,4 +131,8 @@ def patch_streamlit_a11y(show_status: bool = False):
     tells you whether the fixes still apply to the Streamlit it is running on.
     """
     script = _SCRIPT.replace("SHOW_STATUS", "true" if show_status else "false")
-    components.html(script, height=110 if show_status else 0, width=0)
+    if show_status:
+        # Full width, or the box is drawn in a frame nobody can see.
+        components.html(script, height=130)
+    else:
+        components.html(script, height=0, width=0)

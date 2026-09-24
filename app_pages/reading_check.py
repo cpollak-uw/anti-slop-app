@@ -2,7 +2,8 @@ import streamlit as st
 
 from content.reading_check import CITATIONS, DISCUSSION_PROMPTS, INTRO, QUESTIONS
 from utils.downloads import PAGE_NOTE, build_docx, save_section
-from utils.style import banner, label
+from utils.exercise import answer_lines
+from utils.style import banner, callout, label
 
 LETTERS = ["a", "b", "c", "d"]
 N = len(QUESTIONS)
@@ -19,7 +20,7 @@ with st.container(border=True):
     st.write(INTRO)
     for c in CITATIONS:
         st.caption(c)
-st.info(PAGE_NOTE, icon=":material/save:")
+callout("info", PAGE_NOTE)
 
 # ── Part A: quiz ─────────────────────────────────────────────────────────────
 st.header("Part A · Comprehension questions")
@@ -67,21 +68,14 @@ for i, item in enumerate(QUESTIONS):
             # Answered: show the options as a static list with the result marked.
             choice = answers[i]
             st.markdown(item["q"])
-            lines = []
-            for j, opt in enumerate(item["opts"]):
-                if j == item["a"]:
-                    lines.append(f":green-background[✓ ({LETTERS[j]}) {opt}]")
-                elif j == choice:
-                    lines.append(f":red-background[✗ ({LETTERS[j]}) {opt}]")
-                else:
-                    lines.append(f":gray[({LETTERS[j]}) {opt}]")
-            st.markdown("  \n".join(lines))
+            labeled = [f"({LETTERS[j]}) {opt}" for j, opt in enumerate(item["opts"])]
+            st.markdown(answer_lines(labeled, item["a"], choice), unsafe_allow_html=True)
             if choice == item["a"]:
                 score += 1
-                st.success("Correct.", icon=":material/check:")
+                callout("correct", "**Correct.**", announce=True)
             else:
-                st.error(f"Not quite. You chose ({LETTERS[choice]}).", icon=":material/close:")
-            st.info(item["fb"])
+                callout("wrong", f"**Not quite.** You chose ({LETTERS[choice]}).", announce=True)
+            callout("info", item["fb"], announce=True)
 
 answered_count = len(answers)
 st.progress(answered_count / N, text=f"Answered {answered_count} of {N}")

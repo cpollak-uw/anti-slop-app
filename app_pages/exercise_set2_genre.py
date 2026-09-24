@@ -3,7 +3,7 @@ import streamlit as st
 from content.genre_exercises import CITATIONS, GENRES, INTRO
 from utils.downloads import PAGE_NOTE, build_docx, save_section
 from utils.exercise import locked_choice, model_answer, passage, response_box
-from utils.style import banner, label
+from utils.style import banner, callout, label
 
 banner(
     "Exercise Set 2",
@@ -14,7 +14,7 @@ st.caption(INTRO)
 with st.expander("Sources for this exercise set"):
     for c in CITATIONS:
         st.caption(c)
-st.info(PAGE_NOTE, icon=":material/save:")
+callout("info", PAGE_NOTE)
 
 
 def rank_exercise(key, ex):
@@ -35,15 +35,15 @@ def rank_exercise(key, ex):
             store[key] = picks
             st.rerun()
         if all(picks) and not ready:
-            st.warning("Use each version once.")
+            callout("note", "Use each version once.")
         return
     picks = store[key]
     if picks == ex["ranking"]:
-        st.success("Perfect ranking.", icon=":material/check:")
+        callout("correct", "**Perfect ranking.**", announce=True)
     else:
-        st.error("Here is the intended ranking; see the explanation below.", icon=":material/close:")
+        callout("wrong", "Here is the intended ranking; see the explanation below.", announce=True)
     st.markdown("  \n".join(f"**{lbl}:** {v}" for lbl, v in zip(ex["rankLabels"], ex["ranking"])))
-    st.info(ex["explanation"])
+    callout("info", ex["explanation"], announce=True)
 
 
 tabs = st.tabs([g["label"] for g in GENRES])

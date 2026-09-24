@@ -4,7 +4,7 @@ from content.reading_check import CITATIONS
 from content.style_comparison import EXERCISES, EXERCISES_INTRO, PARAGRAPHS, PARAGRAPHS_INTRO
 from utils.downloads import PAGE_NOTE, build_docx, save_section
 from utils.exercise import HL_CSS, highlight, locked_choice, model_answer, passage, response_box
-from utils.style import banner, label
+from utils.style import banner, callout, label
 
 banner(
     "Exercise Set 1",
@@ -14,7 +14,7 @@ banner(
 with st.expander("Sources for this exercise set"):
     for c in CITATIONS:
         st.caption(c)
-st.info(PAGE_NOTE, icon=":material/save:")
+callout("info", PAGE_NOTE)
 
 tab_paras, tab_ex = st.tabs(["Paragraph examples", "Exercises"])
 

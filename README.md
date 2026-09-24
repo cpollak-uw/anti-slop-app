@@ -60,6 +60,21 @@ Go to share.streamlit.io, sign in with your GitHub account, and click **Create a
 
 When you change a file on GitHub later, the app updates itself within a minute or so.
 
+## Look and feel
+
+The app carries two palettes, one for light mode and one for dark, both defined at the top
+of `utils/style.py` as `LIGHT` and `DARK`. It reads the viewer's Streamlit setting through
+`st.context.theme` and uses the matching one, so dark mode really goes dark and Streamlit's
+own toolbar icons stay visible against the page.
+
+To change a color, edit the dictionary entry rather than the CSS below it. Both palettes are
+checked against WCAG AA, so if you change one, check the new value: text needs 4.5:1 against
+the surface behind it, and borders and focus rings need 3:1.
+
+Typography is IBM Plex Sans for headings, labels, and controls, with Literata for reading
+text. `.streamlit/config.toml` carries the light palette as well, which is what the page
+shows for the instant before the app's own styles load.
+
 ## Keeping the app healthy
 
 The app depends on Streamlit's own markup in one place: `utils/a11y.py` adds the landmarks

@@ -1,24 +1,48 @@
 """Shared visual styling, carried over from the HTML site where Streamlit allows it.
 
-The app pins its own colors rather than relying on Streamlit's theme. A viewer can
-switch Streamlit to dark mode from the app's Settings menu, and when that happened the
-page kept this light background while Streamlit recolored its own text and widgets for
-a dark one, which left text that was hard to read. Everything below sets both the
-background and the text color of each surface, so the result is the same in either mode.
+The app pins its own colors rather than relying on Streamlit's theme, because a viewer
+can switch Streamlit to dark mode and Streamlit then recolors its own text while this
+page keeps its light surfaces.
+
+Two rules keep that from producing unreadable combinations, and both are worth holding
+to when editing this file:
+
+1. There are three text colors and nothing else: INK on light surfaces, MUTED for
+   secondary text on light surfaces, and CREAM on the dark banner. Every rule that sets
+   a color also covers descendants (`.thing, .thing *`), because Streamlit wraps text in
+   spans of its own, and a rule that names only the parent leaves those spans to inherit
+   whatever the active theme wants.
+
+2. Status is carried by a border and a label, never by a tinted background. Pale pink and
+   pale green boxes on a cream page are hard to tell apart from the page, so a callout is
+   a white card with a thick colored edge and a colored uppercase label. The label colors
+   below all reach at least 4.5:1 on white, and the edges at least 3:1, which is what
+   WCAG asks of text and of meaningful boundaries.
 """
 
 import re
 
 import streamlit as st
 
-INK = "#1a1410"       # body text
+# Surfaces and text
+INK = "#1a1410"       # body text: 16:1 on cream, 18:1 on white
 CREAM = "#f5f0e8"     # page background
-WARM = "#ede8de"      # sidebar, secondary surfaces
-CARD = "#ffffff"      # cards, inputs
-RULE = "#d5ccc0"      # borders
-GOLD = "#c4a882"
-BROWN = "#6b5030"     # primary accent
-MUTED = "#5a4f44"     # captions
+WARM = "#ede8de"      # sidebar
+CARD = "#ffffff"      # cards, inputs, callouts
+RULE = "#8f816c"      # borders: 3.3:1 on cream, 3.8:1 on white, so a card edge
+                      # is visible as a boundary, per WCAG 1.4.11
+GOLD = "#c4a882"      # only ever on the dark banner
+BROWN = "#6b5030"     # primary accent: 6.6:1 on cream, 7.4:1 on white
+MUTED = "#55493d"     # secondary text: 8:1 on cream
+
+# Status colors. Used for borders and labels on white cards, never as a fill behind
+# running text.
+OK = "#1d6b43"        # correct
+NO = "#9b2c2c"        # incorrect
+CAUTION = "#8a5a00"   # notes, checkpoints
+NOTE = "#4b3f8f"      # refusal option
+HL_YELLOW = "#ffd97a" # highlighter, with ink text on top
+HL_BLUE = "#a8cdf5"
 
 CSS = f"""
 <style>
@@ -147,40 +171,57 @@ CSS = f"""
   font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
   text-transform: uppercase; color: {GOLD} !important; margin-bottom: 12px;
 }}
-.slop-banner h1 {{
+/* Streamlit wraps heading text in its own <span>, which would otherwise inherit the
+   page's dark text colour and disappear against the banner. Every descendant is
+   coloured here, not just the heading element. */
+.slop-banner h1, .slop-banner h1 * {{
   color: {CREAM} !important; font-size: 2.3rem !important;
   line-height: 1.15 !important; padding: 0 !important; margin: 0 0 8px 0 !important;
 }}
-.slop-banner h1 em {{ color: {GOLD} !important; }}
-.slop-sub {{ color: #b8ab98 !important; font-style: italic; font-size: 0.95rem; line-height: 1.6; }}
+.slop-banner h1 em, .slop-banner h1 em * {{ color: {GOLD} !important; }}
+.slop-kicker, .slop-kicker * {{ color: {GOLD} !important; }}
+.slop-sub, .slop-sub * {{ color: #b8ab98 !important; font-style: italic; font-size: 0.95rem; line-height: 1.6; }}
+/* The little anchor link Streamlit adds beside a heading sits on the dark banner too. */
+.slop-banner a, .slop-banner a *, .slop-banner svg, .slop-banner path, .slop-banner line {{
+  color: {GOLD} !important; stroke: {GOLD} !important; fill: {GOLD} !important;
+}}
 
 /* ── Passages and labels ──────────────────────────────────────────────── */
+.slop-passage, .slop-passage * {{ color: #2a201a !important; }}
 .slop-passage {{
   background: {CARD}; border-left: 3px solid {GOLD};
-  padding: 14px 18px; line-height: 1.8; margin-bottom: 12px; color: #2a201a;
+  padding: 14px 18px; line-height: 1.8; margin-bottom: 12px;
 }}
-.slop-label {{
+.slop-label, .slop-label * {{
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: {BROWN} !important; margin: 8px 0 4px;
 }}
 
-/* ── Callout boxes (used instead of Streamlit's own, which invert in dark mode) ── */
+/* ── Callout boxes (white cards with a colored edge, never a tinted fill) ── */
 .slop-callout {{
-  border-left: 3px solid; padding: 13px 17px; margin: 6px 0 14px;
-  line-height: 1.7; font-size: 0.95rem;
+  background: {CARD} !important;
+  border-left: 5px solid;
+  border-top: 1px solid {RULE}; border-right: 1px solid {RULE}; border-bottom: 1px solid {RULE};
+  padding: 13px 17px; margin: 6px 0 14px; line-height: 1.7; font-size: 0.95rem;
 }}
-.slop-callout, .slop-callout * {{ color: #2a2118 !important; }}
+.slop-callout, .slop-callout * {{ color: {INK} !important; }}
 .slop-callout strong {{ font-weight: 700; }}
-.slop-callout.info    {{ background: {WARM};   border-color: {BROWN}; }}
-.slop-callout.correct {{ background: #e8f4ee; border-color: #4a8c5c; }}
-.slop-callout.wrong   {{ background: #fce8e8; border-color: #9c3a3a; }}
-.slop-callout.note    {{ background: #fffbf2; border-color: #d4a840; }}
-.slop-callout.refusal {{ background: #f0eef8; border-color: #5a4d8c; }}
-.slop-callout.deliver {{ background: #eaf4ee; border-color: #4a8c5c; }}
 .slop-callout .slop-callout-label {{
-  display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; margin-bottom: 5px;
+  display: block; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 6px;
 }}
+.slop-callout.info    {{ border-left-color: {BROWN}; }}
+.slop-callout.info    .slop-callout-label {{ color: {BROWN} !important; }}
+.slop-callout.correct {{ border-left-color: {OK}; }}
+.slop-callout.correct .slop-callout-label, .slop-callout.correct .slop-status {{ color: {OK} !important; }}
+.slop-callout.wrong   {{ border-left-color: {NO}; }}
+.slop-callout.wrong   .slop-callout-label, .slop-callout.wrong .slop-status {{ color: {NO} !important; }}
+.slop-callout.note    {{ border-left-color: {CAUTION}; }}
+.slop-callout.note    .slop-callout-label {{ color: {CAUTION} !important; }}
+.slop-callout.refusal {{ border-left-color: {NOTE}; }}
+.slop-callout.refusal .slop-callout-label {{ color: {NOTE} !important; }}
+.slop-callout.deliver {{ border-left-color: {OK}; }}
+.slop-callout.deliver .slop-callout-label {{ color: {OK} !important; }}
 
 /* ── Keyboard focus ───────────────────────────────────────────────────── */
 /* A visible focus indicator matters for anyone navigating by keyboard, and the
@@ -197,14 +238,37 @@ CSS = f"""
 }}
 
 /* ── Answer lines in locked quiz questions ───────────────────────────── */
-.slop-opt {{ display: block; padding: 3px 6px; margin: 2px 0; line-height: 1.6; }}
-.slop-opt.ok  {{ background: #e8f4ee; color: #1a3a28 !important; }}
-.slop-opt.no  {{ background: #fce8e8; color: #5a1a1a !important; }}
-.slop-opt.dim {{ color: #6b6258 !important; }}
+/* The text stays ink on white; right and wrong are carried by the marker, the edge
+   and the weight, so nothing depends on a pale wash behind the words. */
+.slop-opt {{
+  display: block; padding: 5px 10px; margin: 3px 0; line-height: 1.6;
+  border-left: 4px solid transparent;
+}}
+.slop-opt, .slop-opt * {{ color: {INK} !important; }}
+.slop-opt.ok  {{ border-left-color: {OK}; background: {CARD}; font-weight: 600; }}
+.slop-opt.no  {{ border-left-color: {NO}; background: {CARD}; }}
+.slop-opt.dim {{ border-left-color: {RULE}; }}
+.slop-opt.dim, .slop-opt.dim * {{ color: {MUTED} !important; }}
+.slop-mark {{ font-weight: 700; }}
+.slop-opt.ok .slop-mark {{ color: {OK} !important; }}
+.slop-opt.no .slop-mark {{ color: {NO} !important; }}
 
 /* ── Highlight marks ──────────────────────────────────────────────────── */
-mark.hl-a {{ background: #fde68a !important; color: #2a2118 !important; border-radius: 2px; padding: 0 2px; }}
-mark.hl-b {{ background: #bfdbfe !important; color: #2a2118 !important; border-radius: 2px; padding: 0 2px; }}
+mark.hl-a, mark.hl-a * {{ background: {HL_YELLOW} !important; color: {INK} !important; border-radius: 2px; padding: 0 2px; }}
+mark.hl-b, mark.hl-b * {{ background: {HL_BLUE} !important; color: {INK} !important; border-radius: 2px; padding: 0 2px; }}
+
+/* ── Model answers ────────────────────────────────────────────────────── */
+.slop-model {{
+  background: {CARD}; border-left: 5px solid {OK};
+  border-top: 1px solid {RULE}; border-right: 1px solid {RULE}; border-bottom: 1px solid {RULE};
+  padding: 14px 18px; line-height: 1.8; font-style: italic;
+}}
+.slop-model, .slop-model * {{ color: {INK} !important; }}
+.slop-model .slop-model-label {{
+  display: block; font-style: normal; font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; color: {OK} !important;
+}}
+
 </style>
 """
 

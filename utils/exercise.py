@@ -50,10 +50,10 @@ def locked_choice(key: str, prompt: str, options: list[str], correct: int,
         st.markdown(prompt)
     st.markdown(answer_lines(options, correct, choice), unsafe_allow_html=True)
     if choice == correct:
-        callout("correct", "**Correct.**", announce=True)
+        callout("correct", "That is the right answer.", title="Correct", announce=True)
     else:
-        callout("wrong", f"**Not quite.** The better answer is: {options[correct]}", announce=True)
-    callout("info", explanation, announce=True)
+        callout("wrong", f"The better answer is: {options[correct]}", title="Not quite", announce=True)
+    callout("info", explanation, title="Why")
 
 
 def answer_lines(options: list[str], correct: int, choice: int) -> str:
@@ -63,10 +63,12 @@ def answer_lines(options: list[str], correct: int, choice: int) -> str:
         if j == correct:
             tag = "Correct answer, and your choice: " if j == choice else "Correct answer: "
             out.append(f'<span class="slop-opt ok"><span class="slop-sr-only">{tag}</span>'
-                       f'<span aria-hidden="true">&#10003; </span>{html.escape(opt)}</span>')
+                       f'<span class="slop-mark" aria-hidden="true">&#10003; </span>'
+                       f'{html.escape(opt)}</span>')
         elif j == choice:
             out.append('<span class="slop-opt no"><span class="slop-sr-only">Your answer, '
-                       f'which was not correct: </span><span aria-hidden="true">&#10007; </span>'
+                       'which was not correct: </span>'
+                       '<span class="slop-mark" aria-hidden="true">&#10007; </span>'
                        f'{html.escape(opt)}</span>')
         else:
             out.append(f'<span class="slop-opt dim"><span class="slop-sr-only">Option not chosen: '
@@ -77,8 +79,8 @@ def answer_lines(options: list[str], correct: int, choice: int) -> str:
 def model_answer(text: str):
     with st.expander("Show model answer"):
         st.markdown(
-            f'<div class="slop-passage" style="font-style:italic;background:#eaf4ee;'
-            f'border-left-color:#4a8c5c;color:#1a3a28;">{html.escape(text)}</div>',
+            f'<div class="slop-model"><span class="slop-model-label">Model answer</span>'
+            f'{html.escape(text)}</div>',
             unsafe_allow_html=True,
         )
 

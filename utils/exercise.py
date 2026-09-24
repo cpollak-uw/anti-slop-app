@@ -4,12 +4,9 @@ import html
 
 import streamlit as st
 
-HL_CSS = """
-<style>
-mark.hl-a { background: #fde68a; border-radius: 2px; padding: 0 2px; }
-mark.hl-b { background: #bfdbfe; border-radius: 2px; padding: 0 2px; }
-</style>
-"""
+from utils.style import callout
+
+HL_CSS = ""  # highlight styles now live in utils/style.py
 
 
 def highlight(text: str, terms: list[str], cls: str = "hl-a") -> str:
@@ -51,27 +48,37 @@ def locked_choice(key: str, prompt: str, options: list[str], correct: int,
     choice = store[key]
     if prompt:
         st.markdown(prompt)
-    lines = []
+    st.markdown(answer_lines(options, correct, choice), unsafe_allow_html=True)
+    if choice == correct:
+        callout("correct", "**Correct.**", announce=True)
+    else:
+        callout("wrong", f"**Not quite.** The better answer is: {options[correct]}", announce=True)
+    callout("info", explanation, announce=True)
+
+
+def answer_lines(options: list[str], correct: int, choice: int) -> str:
+    """The options of an answered question, marked right and wrong, in fixed colors."""
+    out = []
     for j, opt in enumerate(options):
         if j == correct:
-            lines.append(f":green-background[✓ {opt}]")
+            tag = "Correct answer, and your choice: " if j == choice else "Correct answer: "
+            out.append(f'<span class="slop-opt ok"><span class="slop-sr-only">{tag}</span>'
+                       f'<span aria-hidden="true">&#10003; </span>{html.escape(opt)}</span>')
         elif j == choice:
-            lines.append(f":red-background[✗ {opt}]")
+            out.append('<span class="slop-opt no"><span class="slop-sr-only">Your answer, '
+                       f'which was not correct: </span><span aria-hidden="true">&#10007; </span>'
+                       f'{html.escape(opt)}</span>')
         else:
-            lines.append(f":gray[{opt}]")
-    st.markdown("\n\n".join(lines))
-    if choice == correct:
-        st.success("Correct.", icon=":material/check:")
-    else:
-        st.error(f"Not quite. The better answer is: {options[correct]}", icon=":material/close:")
-    st.info(explanation)
+            out.append(f'<span class="slop-opt dim"><span class="slop-sr-only">Option not chosen: '
+                       f'</span>{html.escape(opt)}</span>')
+    return "".join(out)
 
 
 def model_answer(text: str):
     with st.expander("Show model answer"):
         st.markdown(
             f'<div class="slop-passage" style="font-style:italic;background:#eaf4ee;'
-            f'border-left-color:#4a8c5c;">{html.escape(text)}</div>',
+            f'border-left-color:#4a8c5c;color:#1a3a28;">{html.escape(text)}</div>',
             unsafe_allow_html=True,
         )
 

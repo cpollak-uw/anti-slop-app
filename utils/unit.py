@@ -20,7 +20,7 @@ from docx import Document
 from docx.shared import Pt
 
 from utils.downloads import PAGE_NOTE, save_section
-from utils.style import banner, label
+from utils.style import banner, callout, label
 
 
 def _k(unit, block_id, field=None):
@@ -36,8 +36,8 @@ def _render_block(unit, b):
             with st.container(border=True):
                 st.markdown(f"**{n}.** {item}")
     elif t == "refusal":
-        st.info(f"**Prefer not to use AI? That's always an option in this course.**\n\n{b['text']}",
-                icon=":material/do_not_touch:")
+        callout("refusal", b["text"],
+                title="Prefer not to use AI? That's always an option in this course.")
     elif t == "sample":
         with st.expander(b["label"], icon=":material/description:"):
             for sec in b["sections"]:
@@ -47,7 +47,7 @@ def _render_block(unit, b):
                     st.markdown(sec["text"])
             st.caption(b["note"])
     elif t == "hint":
-        st.warning(f"**Discussion checkpoint:** {b['text']}", icon=":material/forum:")
+        callout("note", b["text"], title="Discussion checkpoint")
     elif t in ("prompt", "audit", "check"):
         with st.container(border=True):
             if t == "prompt":
@@ -84,7 +84,7 @@ def writing_keys(unit):
 
 def render_unit(unit):
     banner(unit["kicker"], unit["title"], unit["sub"])
-    st.info(PAGE_NOTE, icon=":material/save:")
+    callout("info", PAGE_NOTE)
 
     with st.container(border=True):
         st.markdown(unit["goals_intro"])

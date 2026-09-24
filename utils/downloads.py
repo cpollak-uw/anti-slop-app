@@ -11,6 +11,8 @@ import streamlit as st
 from docx import Document
 from docx.shared import Pt
 
+from utils.style import callout
+
 MIME_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 TYPING_NOTE = (
@@ -77,10 +79,11 @@ def save_section(*, key_prefix: str, name_label: str, field_keys: list[str],
         st.session_state[prepared_key] = current
 
     if st.session_state.get(prepared_key) not in (None, current):
-        st.warning(
+        callout(
+            "note",
             "You've changed something on the page since you prepared your file. Click "
             "**Step 1** again so the new text goes in.",
-            icon=":material/edit:",
+            announce=True,
         )
     elif st.session_state.get(prepared_key):
         st.download_button(

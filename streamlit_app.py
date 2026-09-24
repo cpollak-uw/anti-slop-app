@@ -8,7 +8,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from utils.style import inject_css
+from utils.a11y import patch_streamlit_a11y
+from utils.style import callout, inject_css
 
 st.set_page_config(
     page_title="Writing Against AI Slop",
@@ -16,16 +17,17 @@ st.set_page_config(
     layout="centered",
 )
 inject_css()
+patch_streamlit_a11y()
 
 # Setup check: look for the settings file itself, next to this script. Checking the
 # theme values instead gave a false alarm on Streamlit Community Cloud, which supplies
 # its own theme defaults.
 if not (Path(__file__).parent / ".streamlit" / "config.toml").is_file():
-    st.warning(
+    callout(
+        "note",
         "Setup note for the instructor: the color and font settings file "
-        "(.streamlit/config.toml) is missing, so the app is using Streamlit's default look. "
-        "See step 4 in the README to add it. This note disappears once the file is in place.",
-        icon=":material/palette:",
+        "(.streamlit/config.toml) is missing. The app still looks right, because its colors "
+        "are also set in utils/style.py, but see step 4 in the README to add the file back.",
     )
 
 

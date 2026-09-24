@@ -77,10 +77,13 @@ def palette() -> dict:
         return LIGHT
 
 
-def _css(p: dict) -> str:
+FONT_IMPORT = ("@import url('https://fonts.googleapis.com/css2?"
+               "family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&"
+               "family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&display=swap');")
+
+
+def _rules(p: dict) -> str:
     return f"""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&display=swap');
 
 /* ── Surfaces ──────────────────────────────────────────────────────────── */
 .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"],
@@ -281,12 +284,41 @@ mark.hl-b, mark.hl-b * {{ background: {p['MARK_B']} !important; color: {p['MARK_
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }}
-</style>
 """
 
 
+def _scope(css: str, prefix: str) -> str:
+    """Prefix every selector in a block of CSS, so one palette can be nested under
+    an attribute on <html> and the other under its absence."""
+    out = []
+    for chunk in css.split("}"):
+        if "{" not in chunk:
+            continue
+        selectors, body = chunk.split("{", 1)
+        comment = ""
+        if "*/" in selectors:            # keep the comment above the rule
+            comment, selectors = selectors.rsplit("*/", 1)
+            comment += "*/"
+        parts = [f"{prefix} {sel.strip()}" for sel in selectors.split(",") if sel.strip()]
+        out.append(f"{comment}\n{', '.join(parts)} {{{body}}}")
+    return "\n".join(out)
+
+
+def _css(p_light: dict, p_dark: dict) -> str:
+    """Both palettes in one stylesheet.
+
+    The viewer can switch theme from Streamlit's menu without the script rerunning,
+    so the choice cannot be resolved in Python alone. utils/a11y.py writes the active
+    theme onto <html> as data-slop-theme, and the two scoped blocks below respond to
+    it immediately.
+    """
+    light = _scope(_rules(p_light), 'html:not([data-slop-theme="dark"])')
+    dark = _scope(_rules(p_dark), 'html[data-slop-theme="dark"]')
+    return f"<style>{FONT_IMPORT}{light}{dark}</style>"
+
+
 def inject_css():
-    st.markdown(_css(palette()), unsafe_allow_html=True)
+    st.markdown(_css(LIGHT, DARK), unsafe_allow_html=True)
 
 
 def banner(kicker: str, title_html: str, sub: str = ""):

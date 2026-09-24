@@ -33,8 +33,30 @@ let lastReport = null;   // declared before patch() runs, not after
 // Each fix records whether it found the element it was looking for. If Streamlit
 // renames one of these test IDs in a future release, the count of misses is what
 // tells us, rather than the page quietly losing a landmark.
+// Streamlit records the viewer's theme choice in localStorage and does not rerun the
+// script when it changes, so the stylesheet cannot resolve the choice in Python. The
+// active theme is copied onto <html> here, where utils/style.py's two scoped blocks
+// pick it up at once.
+function syncTheme() {
+  if (blocked) return;
+  let choice = 'System';
+  try {
+    const key = Object.keys(window.parent.localStorage).find(k => k.startsWith('stActiveTheme'));
+    if (key) choice = JSON.parse(window.parent.localStorage.getItem(key));
+  } catch (e) { /* storage unavailable: fall back to the system setting */ }
+  let dark;
+  if (choice === 'Dark') dark = true;
+  else if (choice === 'Light') dark = false;
+  else dark = window.parent.matchMedia('(prefers-color-scheme: dark)').matches;
+  const want = dark ? 'dark' : 'light';
+  if (doc.documentElement.getAttribute('data-slop-theme') !== want) {
+    doc.documentElement.setAttribute('data-slop-theme', want);
+  }
+}
+
 function patch() {
   if (blocked) { report(['the page itself (this browser blocked access to it)']); return; }
+  syncTheme();
   const missing = [];
 
   // 1. The sidebar is a <section> with aria-expanded, which that role does not allow.
@@ -115,6 +137,9 @@ function start() {
   if (blocked) return;
   // Streamlit rebuilds parts of the page as students answer questions, so re-apply.
   new MutationObserver(patch).observe(doc.body, {childList: true, subtree: true});
+  // A theme change in this tab does not raise a storage event, so poll as well.
+  setInterval(syncTheme, 400);
+  window.parent.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
 }
 
 if (document.readyState === 'loading') {

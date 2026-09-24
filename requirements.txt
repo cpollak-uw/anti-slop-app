@@ -1,2 +1,7 @@
-streamlit>=1.50
-python-docx>=1.1
+# Pinned on purpose. Streamlit Cloud installs whatever this file allows every time it
+# rebuilds the app, so an open-ended version would let a new Streamlit arrive without
+# warning. The accessibility patch in utils/a11y.py depends on Streamlit's own markup,
+# so a new version should be tried deliberately. See "Keeping the app healthy" in the
+# README before raising this number.
+streamlit==1.64.0
+python-docx==1.1.2

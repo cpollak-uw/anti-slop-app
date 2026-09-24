@@ -60,6 +60,36 @@ Go to share.streamlit.io, sign in with your GitHub account, and click **Create a
 
 When you change a file on GitHub later, the app updates itself within a minute or so.
 
+## Keeping the app healthy
+
+The app depends on Streamlit's own markup in one place: `utils/a11y.py` adds the landmarks
+and list roles that screen readers need, using Streamlit's internal test IDs. If a future
+Streamlit release renames those, the fixes stop applying. Two things guard against that.
+
+**1. The version is pinned.** `requirements.txt` says `streamlit==1.64.0`, so Streamlit
+Cloud installs that version every time it rebuilds, and a new release can't arrive on its
+own. Nothing changes until you change that line.
+
+**2. The app checks itself.** Add `?check=1` to the end of the app's address, for example
+`https://engl288-pollak.streamlit.app/?check=1`, and two reports appear at the top:
+
+- a version report, comparing the Streamlit the app is running against the version it was
+  tested with (`TESTED_STREAMLIT` in `streamlit_app.py`);
+- an accessibility report, saying whether all three screen reader fixes were applied, and
+  naming any it could not apply.
+
+Students never see either one, because they appear only with `?check=1` in the address.
+
+**A routine that takes two minutes.** Once a quarter, before your course starts, open the
+app with `?check=1` and confirm both reports are green. That is enough, because the pinned
+version means nothing changes in between.
+
+**When you want a newer Streamlit.** Edit the version in `requirements.txt`, wait for the
+app to rebuild, then open it with `?check=1`. If the accessibility report is green, update
+`TESTED_STREAMLIT` in `streamlit_app.py` to match and you're done. If it's red, it names
+the piece it couldn't find, which is what a developer needs in order to fix the selector in
+`utils/a11y.py`. Changing the version back restores the working state in the meantime.
+
 ## Notes
 
 - Nothing students type is stored. Each page has a download button that gives them a Word file of their answers.

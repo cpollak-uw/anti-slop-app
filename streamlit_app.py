@@ -11,13 +11,33 @@ import streamlit as st
 from utils.a11y import patch_streamlit_a11y
 from utils.style import callout, inject_css
 
+# The Streamlit version this app was last tested against. utils/a11y.py depends on
+# Streamlit's own markup, so a newer version should be tried on purpose, not by
+# surprise. requirements.txt pins the same number.
+TESTED_STREAMLIT = "1.64.0"
+
 st.set_page_config(
     page_title="Writing Against AI Slop",
     page_icon="✎",
     layout="centered",
 )
 inject_css()
-patch_streamlit_a11y()
+
+# ?check=1 turns on the instructor health check (see the README).
+HEALTH_CHECK = st.query_params.get("check") == "1"
+patch_streamlit_a11y(show_status=HEALTH_CHECK)
+
+# Health check, shown only with ?check=1 on the end of the address.
+if HEALTH_CHECK:
+    running = st.__version__
+    if running == TESTED_STREAMLIT:
+        callout("correct", f"**Version check: fine.** Streamlit {running}, which is the "
+                           f"version this app was tested against.")
+    else:
+        callout("wrong", f"**Version check: Streamlit has changed.** This app is running "
+                         f"Streamlit {running} but was tested against {TESTED_STREAMLIT}. "
+                         f"Read the accessibility check below, then see 'Keeping the app "
+                         f"healthy' in the README.")
 
 # Setup check: look for the settings file itself, next to this script. Checking the
 # theme values instead gave a false alarm on Streamlit Community Cloud, which supplies

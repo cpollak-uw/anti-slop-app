@@ -71,9 +71,18 @@ To change a color, edit the dictionary entry rather than the CSS below it. Both 
 checked against WCAG AA, so if you change one, check the new value: text needs 4.5:1 against
 the surface behind it, and borders and focus rings need 3:1.
 
+Both palettes ship in every page's stylesheet, scoped to a `data-slop-theme` attribute
+that `utils/a11y.py` writes onto the page from the viewer's Streamlit setting. Streamlit
+does not rerun the script when someone switches theme, so resolving the choice in Python
+alone would leave the old palette on screen until the next click.
+
+`.streamlit/config.toml` defines a `[theme]` and a `[theme.dark]` section. Both are needed:
+with only a light theme defined, Streamlit removes the light / dark / system switcher from
+the app's menu. `toolbarMode` is set to `auto` for the same reason, since `minimal` hides
+the menu that holds the switcher.
+
 Typography is IBM Plex Sans for headings, labels, and controls, with Literata for reading
-text. `.streamlit/config.toml` carries the light palette as well, which is what the page
-shows for the instant before the app's own styles load.
+text.
 
 ## Keeping the app healthy
 

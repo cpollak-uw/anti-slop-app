@@ -16,52 +16,106 @@ import streamlit.components.v1 as components
 _SCRIPT = """
 <script>
 const doc = window.parent.document;
+let lastReport = null;   // declared before patch() runs, not after
 
+// Each fix records whether it found the element it was looking for. If Streamlit
+// renames one of these test IDs in a future release, the count of misses is what
+// tells us, rather than the page quietly losing a landmark.
 function patch() {
+  const missing = [];
+
   // 1. The sidebar is a <section> with aria-expanded, which that role does not allow.
   //    Naming it a navigation landmark makes the attribute valid and gives screen
   //    reader users a "navigation" region to jump to.
   const sidebar = doc.querySelector('section[data-testid="stSidebar"]');
-  if (sidebar && sidebar.getAttribute('role') !== 'navigation') {
-    sidebar.setAttribute('role', 'navigation');
-    sidebar.setAttribute('aria-label', 'Course pages');
-  }
+  if (sidebar) {
+    if (sidebar.getAttribute('role') !== 'navigation') {
+      sidebar.setAttribute('role', 'navigation');
+      sidebar.setAttribute('aria-label', 'Course pages');
+    }
+  } else { missing.push('sidebar (section[data-testid=stSidebar])'); }
 
-  // 2. The page list is a <ul> whose direct children include section headers
-  //    ("Start here", "Course units"). Marking them as list items keeps the list
-  //    valid, and the pages inside stay reachable as list items.
-  doc.querySelectorAll('ul[data-testid="stSidebarNavItems"]').forEach(ul => {
-    // The <ul> mixes section headers with <div> wrappers that each hold the <li>
-    // links. Dropping the list role from the outer <ul> and giving each wrapper a
-    // list role puts every <li> inside a real list, which is what a screen reader
-    // needs in order to announce "list, 3 items".
-    ul.setAttribute('role', 'none');
-    [...ul.children].forEach(child => {
-      if (child.tagName === 'DIV' && child.querySelector('li')) {
-        child.setAttribute('role', 'list');
-      }
+  // 2. The page list is a <ul> that mixes section headers with <div> wrappers holding
+  //    the <li> links. Dropping the list role from the <ul> and giving each wrapper a
+  //    list role puts every <li> inside a real list.
+  const navLists = doc.querySelectorAll('ul[data-testid="stSidebarNavItems"]');
+  if (navLists.length) {
+    navLists.forEach(ul => {
+      ul.setAttribute('role', 'none');
+      [...ul.children].forEach(child => {
+        if (child.tagName === 'DIV' && child.querySelector('li')) {
+          child.setAttribute('role', 'list');
+        }
+      });
     });
-  });
+  } else { missing.push('page list (ul[data-testid=stSidebarNavItems])'); }
 
-  // 3. The page content itself sits in an unlabelled <section>. Without a main
-  //    landmark, a screen reader has no way to skip the navigation.
+  // 3. Without a main landmark a screen reader cannot skip the navigation.
   const main = doc.querySelector('section[data-testid="stMain"]');
-  if (main && main.getAttribute('role') !== 'main') {
-    main.setAttribute('role', 'main');
-    main.setAttribute('aria-label', 'Page content');
-  }
+  if (main) {
+    if (main.getAttribute('role') !== 'main') {
+      main.setAttribute('role', 'main');
+      main.setAttribute('aria-label', 'Page content');
+    }
+  } else { missing.push('content area (section[data-testid=stMain])'); }
 
-  // 4. The component's own iframe is decorative and should not be announced.
+  // 4. This component's own iframe is decorative and should not be announced.
   doc.querySelectorAll('iframe[title="streamlit_component"], .stCustomComponentV1')
      .forEach(f => { f.setAttribute('aria-hidden', 'true'); f.setAttribute('tabindex', '-1'); });
+
+  report(missing);
 }
 
-patch();
-// Streamlit rebuilds parts of the page as students answer questions, so re-apply.
-new MutationObserver(patch).observe(doc.body, {childList: true, subtree: true});
+function report(missing) {
+  const state = missing.join('; ');
+  if (state === lastReport) return;      // nothing changed since the last pass
+  lastReport = state;
+  if (missing.length) {
+    console.warn('Accessibility patch could not find: ' + state +
+                 '. Streamlit markup has probably changed.');
+  }
+  // SHOW_STATUS is filled in from Python: true only when the instructor opens the
+  // app with ?check=1 on the end of the address. The box is drawn inside this
+  // component's own frame, so it never disturbs the page itself.
+  if (!SHOW_STATUS || !document.body) return;
+  document.body.style.margin = '0';
+  document.body.innerHTML =
+    '<div style="padding:12px 16px;border-left:4px solid;font-family:Georgia,serif;' +
+    'font-size:0.95rem;line-height:1.6;' +
+    (missing.length ? 'background:#fce8e8;border-color:#9c3a3a;color:#5a1a1a;"'
+                    : 'background:#e8f4ee;border-color:#4a8c5c;color:#1a3a28;"') + '>' +
+    (missing.length
+      ? '<strong>Accessibility check: FAILED.</strong> Could not find ' + state +
+        '. The screen reader fixes are not being applied, so Streamlit has probably ' +
+        'changed its markup. See "Keeping the app healthy" in the README.'
+      : '<strong>Accessibility check: passed.</strong> All three screen reader fixes ' +
+        'are in place: navigation landmark, page list, and main landmark.') +
+    '</div>';
+}
+
+// This script runs before its own frame has a <body>, so the first pass waits for it.
+function start() {
+  lastReport = null;   // make sure the status box is drawn on this pass
+  patch();
+  // Streamlit rebuilds parts of the page as students answer questions, so re-apply.
+  new MutationObserver(patch).observe(doc.body, {childList: true, subtree: true});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', start);
+} else {
+  start();
+}
 </script>
 """
 
 
-def patch_streamlit_a11y():
-    components.html(_SCRIPT, height=0, width=0)
+def patch_streamlit_a11y(show_status: bool = False):
+    """Apply the fixes. With show_status=True the component reports what it found.
+
+    The status box is what makes this maintainable: rather than reading Streamlit's
+    release notes, open the app with ?check=1 on the end of its address and the app
+    tells you whether the fixes still apply to the Streamlit it is running on.
+    """
+    script = _SCRIPT.replace("SHOW_STATUS", "true" if show_status else "false")
+    components.html(script, height=110 if show_status else 0, width=0)

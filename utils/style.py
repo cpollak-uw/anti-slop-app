@@ -4,6 +4,36 @@ import streamlit as st
 
 CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap');
+
+/* Palette and fonts, applied here as well as in .streamlit/config.toml. The config
+   file sets Streamlit's own theme, but a viewer's saved theme choice can override it,
+   so these rules keep the page looking the same for everyone. */
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+  background: #f5f0e8 !important;
+  color: #1a1410 !important;
+}
+[data-testid="stSidebar"] { background: #ede8de !important; }
+[data-testid="stSidebar"] * { color: #3a3028 !important; }
+/* No !important here on purpose: these rules are inherited by ordinary text but
+   leave Streamlit's icon fonts alone, which would otherwise print as words. */
+.stApp { font-family: 'Source Serif 4', Georgia, serif; }
+.stApp textarea, .stApp input, .stApp button, .stApp select {
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+/* Streamlit's icons are glyphs in an icon font. Without this they inherit the serif
+   above and print as words such as "home" or "mail". */
+[data-testid="stIconMaterial"] { font-family: 'Material Symbols Rounded' !important; }
+.stApp h1, .stApp h2, .stApp h3, .stApp h4 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  color: #1a1410 !important;
+}
+.stApp a { color: #6b5030 !important; }
+[data-testid="stBaseButton-primary"] {
+  background: #6b5030 !important; border-color: #6b5030 !important; color: #f5f0e8 !important;
+}
+[data-testid="stBaseButton-primary"] * { color: #f5f0e8 !important; }
+
 /* Dark banner at the top of each page, like the HTML site's header */
 .slop-banner {
   background: #1a1410;

@@ -39,11 +39,11 @@ def rank_exercise(key, ex):
         return
     picks = store[key]
     if picks == ex["ranking"]:
-        callout("correct", "**Perfect ranking.**", announce=True)
+        callout("correct", "Perfect ranking.", title="Correct", announce=True)
     else:
-        callout("wrong", "Here is the intended ranking; see the explanation below.", announce=True)
+        callout("wrong", "Here is the intended ranking; see the explanation below.", title="Not quite", announce=True)
     st.markdown("  \n".join(f"**{lbl}:** {v}" for lbl, v in zip(ex["rankLabels"], ex["ranking"])))
-    callout("info", ex["explanation"], announce=True)
+    callout("info", ex["explanation"], title="Why")
 
 
 tabs = st.tabs([g["label"] for g in GENRES])

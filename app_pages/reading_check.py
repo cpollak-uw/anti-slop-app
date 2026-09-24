@@ -72,10 +72,10 @@ for i, item in enumerate(QUESTIONS):
             st.markdown(answer_lines(labeled, item["a"], choice), unsafe_allow_html=True)
             if choice == item["a"]:
                 score += 1
-                callout("correct", "**Correct.**", announce=True)
+                callout("correct", "That is the right answer.", title="Correct", announce=True)
             else:
-                callout("wrong", f"**Not quite.** You chose ({LETTERS[choice]}).", announce=True)
-            callout("info", item["fb"], announce=True)
+                callout("wrong", f"You chose ({LETTERS[choice]}).", title="Not quite", announce=True)
+            callout("info", item["fb"], title="Why")
 
 answered_count = len(answers)
 st.progress(answered_count / N, text=f"Answered {answered_count} of {N}")

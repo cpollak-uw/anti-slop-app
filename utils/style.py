@@ -17,6 +17,9 @@ Rules worth holding to when editing this file:
 3. Status is carried by an edge and a label, never by a tinted fill behind running text.
 4. Both palettes are checked against WCAG AA: text on every surface at 4.5:1 or better,
    borders and focus rings at 3:1 or better.
+5. Nothing here sets a background on <body>. Streamlit colors that element from its
+   active theme, and utils/a11y.py reads it to decide which palette applies. Styling it
+   would blind that check.
 """
 
 import re
@@ -25,17 +28,14 @@ import streamlit as st
 
 LIGHT = {
     "PAGE": "#f5f5f7",      # cool near-white, deliberately not cream
-    "SURFACE": "#ffffff",   # cards, inputs, callouts
+    "SURFACE": "#ffffff",   # cards and callouts
+    "INPUT": "#e9eaef",     # text boxes, a shade off the card so the field is visible
     "RAISED": "#ececed",    # sidebar
     "TEXT": "#14151a",
     "MUTED": "#4c4f58",
-    "BORDER": "#868c98",   # 3.1:1 on PAGE, 3.4:1 on SURFACE
+    "BORDER": "#787e8c",   # 3.7:1 on PAGE, 4.1:1 on SURFACE, 3.4:1 on INPUT
     "ACCENT": "#553a9e",    # violet, a nod to UW purple without claiming the brand
     "ACCENT_SOFT": "#ede9f7",
-    "BANNER": "#1d1730",
-    "BANNER_TEXT": "#f4f2f9",
-    "BANNER_DIM": "#b9b2cc",
-    "BANNER_ACCENT": "#c3b2f2",
     "OK": "#1a6b41",
     "NO": "#98292b",
     "CAUTION": "#7d5300",
@@ -48,16 +48,13 @@ LIGHT = {
 DARK = {
     "PAGE": "#15161c",
     "SURFACE": "#1e2029",
+    "INPUT": "#282b36",
     "RAISED": "#1a1c23",
     "TEXT": "#edeef2",
     "MUTED": "#b2b7c2",
     "BORDER": "#767c88",
     "ACCENT": "#bcaaf5",
     "ACCENT_SOFT": "#2a2540",
-    "BANNER": "#221b38",
-    "BANNER_TEXT": "#f4f2f9",
-    "BANNER_DIM": "#b9b2cc",
-    "BANNER_ACCENT": "#c3b2f2",
     "OK": "#6fd39b",
     "NO": "#f0908f",
     "CAUTION": "#e3b256",
@@ -118,11 +115,19 @@ def _rules(p: dict) -> str:
 .stApp [data-testid="stExpander"] summary {{
   background: {p['SURFACE']} !important; border-color: {p['BORDER']} !important;
 }}
+/* A text box has to be findable. Cards and inputs both used the same surface, so in
+   either mode the field vanished into the card behind it: an empty box with no edge.
+   The field now sits a shade off the card and carries a border of its own. */
 .stApp textarea, .stApp input, .stApp [data-baseweb="input"],
 .stApp [data-baseweb="base-input"], .stApp [data-baseweb="textarea"],
-.stApp [data-baseweb="select"] > div {{
-  background: {p['SURFACE']} !important; color: {p['TEXT']} !important;
+.stApp [data-baseweb="select"] > div,
+.stApp [data-testid="stTextAreaRootElement"], .stApp [data-testid="stTextInputRootElement"] {{
+  background: {p['INPUT']} !important; color: {p['TEXT']} !important;
   border-color: {p['BORDER']} !important;
+}}
+.stApp [data-testid="stTextAreaRootElement"], .stApp [data-testid="stTextInputRootElement"],
+.stApp [data-baseweb="select"] > div {{
+  border: 1.5px solid {p['BORDER']} !important;
 }}
 .stApp textarea::placeholder, .stApp input::placeholder {{
   color: {p['MUTED']} !important; opacity: 1 !important;
@@ -184,27 +189,34 @@ def _rules(p: dict) -> str:
 [data-baseweb="tab-highlight"] {{ background-color: {p['ACCENT']} !important; }}
 [data-baseweb="tab-border"] {{ background-color: {p['BORDER']} !important; }}
 
-/* ── Banner: the same deep violet block in both modes ─────────────────── */
+/* ── Masthead ─────────────────────────────────────────────────────────
+   The page title used to sit in a filled block. That works against a near-white
+   page but not against a dark one: no fill dark enough to keep the kicker legible
+   is light enough to separate from the page behind it, so in dark mode the block
+   turned into a muddy rectangle. The title now sits on the page itself, and a thick
+   accent bar carries the emphasis. The bar is the accent color, which is 7.8:1
+   against the page in light mode and 8.8:1 in dark, so it reads in both. */
 .slop-banner {{
-  background: {p['BANNER']} !important;
-  padding: 34px 32px 28px; margin-bottom: 26px;
-  border-bottom: 3px solid {p['BANNER_ACCENT']};
+  background: transparent !important;
+  padding: 10px 0 20px 22px; margin-bottom: 26px;
+  border-left: 6px solid {p['ACCENT']};
+  border-bottom: 1px solid {p['BORDER']};
 }}
 .slop-kicker, .slop-kicker * {{
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em;
-  text-transform: uppercase; color: {p['BANNER_ACCENT']} !important; margin-bottom: 12px;
+  text-transform: uppercase; color: {p['ACCENT']} !important; margin-bottom: 10px;
 }}
 .slop-banner h1, .slop-banner h1 * {{
-  color: {p['BANNER_TEXT']} !important; font-size: 2.1rem !important;
+  color: {p['TEXT']} !important; font-size: 2.1rem !important;
   line-height: 1.2 !important; padding: 0 !important; margin: 0 0 8px 0 !important;
 }}
-.slop-banner h1 em, .slop-banner h1 em * {{ color: {p['BANNER_ACCENT']} !important; font-style: italic; }}
+.slop-banner h1 em, .slop-banner h1 em * {{ color: {p['ACCENT']} !important; font-style: italic; }}
 .slop-sub, .slop-sub * {{
-  color: {p['BANNER_DIM']} !important; font-style: italic; font-size: 0.95rem; line-height: 1.6;
+  color: {p['MUTED']} !important; font-style: italic; font-size: 0.95rem; line-height: 1.6;
 }}
 .slop-banner a, .slop-banner a *, .slop-banner svg, .slop-banner path, .slop-banner line {{
-  color: {p['BANNER_ACCENT']} !important; stroke: {p['BANNER_ACCENT']} !important; fill: {p['BANNER_ACCENT']} !important;
+  color: {p['ACCENT']} !important; stroke: {p['ACCENT']} !important; fill: {p['ACCENT']} !important;
 }}
 
 /* ── Passages and labels ──────────────────────────────────────────────── */

@@ -33,22 +33,34 @@ let lastReport = null;   // declared before patch() runs, not after
 // Each fix records whether it found the element it was looking for. If Streamlit
 // renames one of these test IDs in a future release, the count of misses is what
 // tells us, rather than the page quietly losing a landmark.
-// Streamlit records the viewer's theme choice in localStorage and does not rerun the
-// script when it changes, so the stylesheet cannot resolve the choice in Python. The
-// active theme is copied onto <html> here, where utils/style.py's two scoped blocks
-// pick it up at once.
+// Which palette to use is read from the page itself: Streamlit colors <body> from its
+// active theme, and the app never overrides that element, so the color of <body> says
+// which theme is in force however it was chosen (menu, system setting, or default).
+// An earlier version read the choice from localStorage instead, which worked locally
+// but not on Streamlit Community Cloud, where that read fails and every theme then
+// fell back to the system setting.
+function themeIsDark() {
+  try {
+    const bg = window.parent.getComputedStyle(doc.body).backgroundColor;
+    const m = bg.match(/rgba?\(([^)]+)\)/);
+    if (m) {
+      const [r, g, b, a] = m[1].split(',').map(x => parseFloat(x));
+      if (a === undefined || a > 0) {
+        // Rec. 709 luma, which is enough to tell a dark surface from a light one.
+        return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 128;
+      }
+    }
+  } catch (e) { /* fall through to the system setting */ }
+  try {
+    return window.parent.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch (e) {
+    return false;
+  }
+}
+
 function syncTheme() {
   if (blocked) return;
-  let choice = 'System';
-  try {
-    const key = Object.keys(window.parent.localStorage).find(k => k.startsWith('stActiveTheme'));
-    if (key) choice = JSON.parse(window.parent.localStorage.getItem(key));
-  } catch (e) { /* storage unavailable: fall back to the system setting */ }
-  let dark;
-  if (choice === 'Dark') dark = true;
-  else if (choice === 'Light') dark = false;
-  else dark = window.parent.matchMedia('(prefers-color-scheme: dark)').matches;
-  const want = dark ? 'dark' : 'light';
+  const want = themeIsDark() ? 'dark' : 'light';
   if (doc.documentElement.getAttribute('data-slop-theme') !== want) {
     doc.documentElement.setAttribute('data-slop-theme', want);
   }
@@ -94,7 +106,14 @@ function patch() {
     }
   } else { missing.push('content area (section[data-testid=stMain])'); }
 
-  // 4. This component's own iframe is decorative and should not be announced.
+  // 4. Streamlit's sidebar toggle ships with an empty aria-label, so a screen reader
+  //    announces a button with no name. The label is supplied here.
+  doc.querySelectorAll('[data-testid="stSidebarCollapseButton"] button, ' +
+                       '[data-testid="stExpandSidebarButton"] button').forEach(b => {
+    if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', 'Show or hide the page list');
+  });
+
+  // 5. This component's own iframe is decorative and should not be announced.
   doc.querySelectorAll('iframe[title="streamlit_component"], .stCustomComponentV1')
      .forEach(f => { f.setAttribute('aria-hidden', 'true'); f.setAttribute('tabindex', '-1'); });
 

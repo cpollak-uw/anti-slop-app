@@ -52,10 +52,14 @@ st.caption(
     "writing: DeLuca et al. (2025) and Reinhart et al. (2025) (linked above; cited in full at the "
     "bottom of this page). Read the articles first, and then check your understanding in this section."
 )
-card("app_pages/reading_check.py", "Reading Check",
-     "How LLMs Actually Write: Quiz & Discussion Prompts",
-     "A self-graded comprehension quiz on DeLuca et al. (2025) and Reinhart et al. (2025), with "
-     "five discussion prompts for class.", ":material/menu_book:")
+card("app_pages/reading_check_deluca.py", "Reading Check 1",
+     "How ChatGPT Writes an Introduction",
+     "A self-graded comprehension quiz on DeLuca et al. (2025), with four discussion prompts "
+     "for class.", ":material/menu_book:")
+card("app_pages/reading_check_reinhart.py", "Reading Check 2",
+     "Do LLMs Write Like Humans?",
+     "A self-graded comprehension quiz on Reinhart et al. (2025), with two discussion prompts "
+     "for class. Do this one after Reading Check 1.", ":material/menu_book:")
 
 st.header("Course units · In-class activities")
 st.caption(

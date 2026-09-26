@@ -56,7 +56,8 @@ pages = {
         st.Page("app_pages/home.py", title="Home", icon=":material/home:", default=True),
     ],
     "Start here": [
-        st.Page("app_pages/reading_check.py", title="Reading Check", icon=":material/menu_book:"),
+        st.Page("app_pages/reading_check_deluca.py", title="Reading Check 1: DeLuca", icon=":material/menu_book:"),
+        st.Page("app_pages/reading_check_reinhart.py", title="Reading Check 2: Reinhart", icon=":material/menu_book:"),
     ],
     "Course units": [
         st.Page("app_pages/unit1_cover_letters.py", title="Unit 1: Cover Letters", icon=":material/mail:"),

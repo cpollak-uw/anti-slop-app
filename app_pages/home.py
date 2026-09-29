@@ -141,7 +141,5 @@ st.caption(
     "[Calvin Pollak](https://english.washington.edu/people/calvin-pollak) · University of "
     "Washington · These materials may be freely used and adapted for educational purposes. "
     "Please cite: Pollak, 2026. Writing Against AI Slop: Practice exercises for Technical and "
-    "Professional Communication. Available from: https://cpollak-uw.github.io/ai-style-exercises/  \n"
-    "Conference slides: [Less \"Slop\", More Human (IEEE ProComm 2026)]"
-    "(https://cpollak-uw.github.io/ai-style-exercises/slides.pdf)"
+    "Professional Communication. Available from: https://engl288-pollak.streamlit.app/  \n"
 )

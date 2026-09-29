@@ -31,7 +31,7 @@ st.markdown(
 )
 st.caption(
     "Note: This project is in beta testing, and Autumn 2026 is the first quarter I'm using it in class. "
-    "The exercises, chatbot, and research background/summaries included here were developed in a "
+    "The exercises and research background/summaries included here were developed in a "
     "dialogic, iterative composition process with Claude. All text examples (including \"more "
     "human\" examples) are model-generated with extensive prompt engineering and post-generation "
     "editing by me. The previously-generated \"slop\" examples on the unit pages are the "
@@ -80,7 +80,7 @@ card("app_pages/unit3_proposals.py", "Unit 3 · Local Change Proposal", "Proposa
      "their own proposals from argument and narrative for a real decisionmaker, and closely edit "
      "their drafts.", ":material/description:")
 
-st.header("Practice anytime · Exercises & coach")
+st.header("Practice anytime · Exercises")
 st.caption(
     "These exercises give practice at the sentence and paragraph level, and they can be assigned "
     "before or alongside the unit activities."
@@ -91,10 +91,6 @@ card("app_pages/exercise_set1_style.py", "Exercise Set 1", "AI Slop Style vs. a 
 card("app_pages/exercise_set2_genre.py", "Exercise Set 2", "Writing in a More Human Style: Genre Exercises",
      "Genre-specific exercises in cover letters, instructional documents, and proposals, with "
      "model answers.", ":material/edit_note:")
-card("https://claude.ai/public/artifacts/9cb59e90-6438-4ba4-bb86-06147f5811e6",
-     "AI Style Coach · Requires free Claude.ai account", "Chatbot Practice Tool",
-     "A conversational coach that gives guided exercises with detailed feedback, or analyzes your "
-     "own writing for AI slop features. Opens in a new tab.", ":material/forum:")
 
 st.header("Research background")
 with st.expander("Read the research summary and full citations"):

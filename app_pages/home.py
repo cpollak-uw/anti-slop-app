@@ -9,7 +9,7 @@ banner(
 )
 
 st.markdown(
-    "I'm Calvin Pollak, an [Assistant Teaching Professor of Technical and Professional "
+    "I'm Calvin Pollak, an [Associate Teaching Professor of Technical and Professional "
     "Communication at the University of Washington](https://english.washington.edu/people/calvin-pollak). "
     "In this project, I'm drawing from recent research on the peculiar language style of "
     "AI-generated text ([DeLuca et al., 2025](https://doi.org/10.1080/26939169.2025.2497547); "

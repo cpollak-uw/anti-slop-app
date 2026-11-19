@@ -98,14 +98,14 @@ with st.expander("Read the research summary and full citations"):
         "The style contrast underlying these materials is drawn from two recent corpus-based "
         "studies. [DeLuca et al. (2025)](https://doi.org/10.1080/26939169.2025.2497547) compared "
         "report introductions written by ChatGPT, by undergraduate students, and by published "
-        "researchers, and were able to stylistically distinguish the machine-generated writing" 
+        "researchers, and were able to stylistically distinguish the machine-generated writing " 
         "from both human groups. AI slop was far more informationally dense than the student writing, "
         "it compressed information into noun phrases (often with vague content), and it barely modulated "
         "its confidence: ChatGPT-generated text contained the predictive modal \"will\" 199 times "
         "while not including \"may,\" \"might,\" or \"could\" at all. None of its introductions included "
         "numeric values, and its claims of importance depended on unmeasurable attributes where "
         "expert writers more typically assign measurable ones. The authors place ChatGPT’s style "
-        "somewhere in between novices and experts, not exactly (or effectively) mimicking either. "
+        "somewhere in between novice and expert, not effectively mimicking either. "
         )
     st.markdown(
         "[Reinhart et al. (2025)](https://www.pnas.org/doi/abs/10.1073/pnas.2422455122), a "

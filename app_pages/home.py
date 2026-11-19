@@ -18,7 +18,7 @@ st.markdown(
     "language style \"AI slop\". When I first read these articles, I immediately wanted to "
     "operationalize their findings about the specific features of slop into teaching resources "
     "for Technical and Professional Communication. This app collects the practice exercises and "
-    "in-class activities for my course. It's organized to follow the course itself: the assigned "
+    "in-class activities for my course. It's organized to follow the course structure: the assigned "
     "readings come first, and then there is one activity page for each of the three major projects."
 )
 st.markdown(
@@ -98,14 +98,14 @@ with st.expander("Read the research summary and full citations"):
         "The style contrast underlying these materials is drawn from two recent corpus-based "
         "studies. [DeLuca et al. (2025)](https://doi.org/10.1080/26939169.2025.2497547) compared "
         "report introductions written by ChatGPT, by undergraduate students, and by published "
-        "researchers, and the machine-generated writing separated cleanly from both human groups. "
-        "It was far more informationally dense than the student writing, it compressed information "
-        "into noun phrases whose content could stay vague, and it barely modulated its confidence: "
-        "ChatGPT used the predictive modal \"will\" 199 times while \"may,\" \"might,\" and "
-        "\"could\" did not appear at all. None of its introductions included numeric values, and "
-        "its claims of importance rested on unmeasurable attributes where expert writers assign "
-        "measurable ones. The authors place ChatGPT’s style somewhere in between novices and "
-        "experts, not exactly mimicking either. "
+        "researchers, and were able to stylistically distinguish the machine-generated writing" 
+        "from both human groups. AI slop was far more informationally dense than the student writing, "
+        "it compressed information into noun phrases (often with vague content), and it barely modulated "
+        "its confidence: ChatGPT-generated text contained the predictive modal \"will\" 199 times "
+        "while not including \"may,\" \"might,\" or \"could\" at all. None of its introductions included "
+        "numeric values, and its claims of importance depended on unmeasurable attributes where 
+        "expert writers more typically assign measurable ones. The authors place ChatGPT’s style 
+        "somewhere in between novices and experts, not exactly (or effectively) mimicking either. "
         "[Reinhart et al. (2025)](https://www.pnas.org/doi/abs/10.1073/pnas.2422455122), a "
         "companion study from the same research group, examined multiple LLMs and found that "
         "instruction-tuned models use present participial clauses at 2–5× the human rate and "
@@ -113,7 +113,11 @@ with st.expander("Read the research summary and full citations"):
         "model-specific: the GPT-4o models avoid clausal co-ordination (they favor noun-to-noun "
         "phrasal co-ordination instead), while all of the Llama 3 variants use clausal "
         "co-ordination more than humans do. Importantly, base models wrote much closer to human "
-        "norms, which suggests that instruction tuning introduces the style."
+        "norms, which suggests that instruction tuning introduces the style. Instruction tuning is"
+        "the process by which language models are trained to answer typical questions and complete"
+        "common tasks, especially those regularly used for model benchmarking such as reasoning, "
+        "mathematics, and programming, so this research raises deeper and more profound questions " 
+        "about the rhetoric and political economy of AI developers' instruction tuning procedures."
     )
     st.caption(
         "DeLuca, L. S., Reinhart, A., Weinberg, G., Laudenbach, M., Miller, S., & Brown, D. W. "

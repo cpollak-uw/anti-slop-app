@@ -103,8 +103,8 @@ with st.expander("Read the research summary and full citations"):
         "it compressed information into noun phrases (often with vague content), and it barely modulated "
         "its confidence: ChatGPT-generated text contained the predictive modal \"will\" 199 times "
         "while not including \"may,\" \"might,\" or \"could\" at all. None of its introductions included "
-        "numeric values, and its claims of importance depended on unmeasurable attributes where 
-        "expert writers more typically assign measurable ones. The authors place ChatGPT’s style 
+        "numeric values, and its claims of importance depended on unmeasurable attributes where "
+        "expert writers more typically assign measurable ones. The authors place ChatGPT’s style "
         "somewhere in between novices and experts, not exactly (or effectively) mimicking either. "
         "[Reinhart et al. (2025)](https://www.pnas.org/doi/abs/10.1073/pnas.2422455122), a "
         "companion study from the same research group, examined multiple LLMs and found that "

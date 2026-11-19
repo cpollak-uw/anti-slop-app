@@ -106,6 +106,8 @@ with st.expander("Read the research summary and full citations"):
         "numeric values, and its claims of importance depended on unmeasurable attributes where "
         "expert writers more typically assign measurable ones. The authors place ChatGPT’s style "
         "somewhere in between novices and experts, not exactly (or effectively) mimicking either. "
+        )
+    st.markdown(
         "[Reinhart et al. (2025)](https://www.pnas.org/doi/abs/10.1073/pnas.2422455122), a "
         "companion study from the same research group, examined multiple LLMs and found that "
         "instruction-tuned models use present participial clauses at 2–5× the human rate and "
@@ -113,11 +115,13 @@ with st.expander("Read the research summary and full citations"):
         "model-specific: the GPT-4o models avoid clausal co-ordination (they favor noun-to-noun "
         "phrasal co-ordination instead), while all of the Llama 3 variants use clausal "
         "co-ordination more than humans do. Importantly, base models wrote much closer to human "
-        "norms, which suggests that instruction tuning introduces the style. Instruction tuning is"
-        "the process by which language models are trained to answer typical questions and complete"
-        "common tasks, especially those regularly used for model benchmarking such as reasoning, "
-        "mathematics, and programming, so this research raises deeper and more profound questions " 
-        "about the rhetoric and political economy of AI developers' instruction tuning procedures."
+        "norms, which suggests that instruction tuning introduces the style. "
+        )
+    st.markdown(
+        "Instruction tuning is the process by which language models are trained to answer typical "
+        "questions and complete common tasks, especially those regularly used for model benchmarking "
+        "such as reasoning, mathematics, and programming tasks, so this research raises deeper and more "
+        "profound questions about the rhetoric and political economy of instruction tuning processes."
     )
     st.caption(
         "DeLuca, L. S., Reinhart, A., Weinberg, G., Laudenbach, M., Miller, S., & Brown, D. W. "

@@ -113,9 +113,9 @@ with st.expander("Read the research summary and full citations"):
         "instruction-tuned models use present participial clauses at 2–5× the human rate and "
         "nominalizations at roughly 1.5–2× the human rate. Some patterns turned out to be "
         "model-specific: the GPT-4o models avoid clausal co-ordination (they favor noun-to-noun "
-        "phrasal co-ordination instead), while all of the Llama 3 variants use clausal "
-        "co-ordination more than humans do. Importantly, base models wrote much closer to human "
-        "norms, which suggests that instruction tuning introduces the style. "
+        "phrasal co-ordination instead), while all of Meta's Llama 3 variants use clausal "
+        "co-ordination more than humans do. Importantly, base models generate text that is much "
+        "closer to human feature rates, which suggests that instruction tuning introduces the style. "
         )
     st.markdown(
         "Instruction tuning is the process by which language models are trained to answer typical "

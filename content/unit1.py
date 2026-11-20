@@ -62,10 +62,10 @@ UNIT = {
                  "text": "Long modifier chains: \"comprehensive skill set,\" \"strategic content creation.\" Pick the densest one. Does the letter ever unpack it with a concrete detail, or does it stay abstract?",
                  "placeholder": "Quote the densest noun phrase and say whether it ever gets grounded…"},
                 {"type": "audit", "id": "f4", "title": "4 · Missing hedges and modality",
-                 "text": "Generated text barely modulates its confidence: in DeLuca et al.’s samples, ChatGPT used \"will\" 199 times across 100 introductions, while \"may,\" \"might,\" and \"could\" did not appear at all. Find the most overstated claim in the letter. How would a thoughtful human applicant have qualified it?",
+                 "text": "Generated text barely hedges its confidence: in DeLuca et al.’s samples, ChatGPT used \"will\" 199 times across 100 introductions, while \"may,\" \"might,\" and \"could\" did not appear at all. Find the most overstated claim in the letter. How would a thoughtful human applicant have qualified it?",
                  "placeholder": "Quote the overstatement and rewrite it with moderated confidence…"},
                 {"type": "audit", "id": "f5", "title": "5 · Phrasal (not clausal) co-ordination",
-                 "text": "Nouns linked to nouns (\"training, scheduling coordination, and operational optimization\") instead of ideas linked to ideas (\"I trained six new hires, and that taught me…\"). Find a list of nouns that hides a story.",
+                 "text": "Nouns linked to nouns (\"training, scheduling coordination, and operational optimization\") instead of ideas linked to ideas (\"I trained six new hires, and that taught me…\"). Find a list of nouns that hides a story or obscures an argument.",
                  "placeholder": "Quote the noun list and sketch the story it's hiding…"},
                 {"type": "audit", "id": "f6", "title": "6 · Missing concrete examples",
                  "text": "DeLuca et al. found that the ChatGPT-generated introductions in their study included no numeric values at all, with claims of importance resting on vague, unmeasurable attributes. The resume had real numbers (400→1,900 followers, 800 lbs of food, 12-person team). What did the letter do with them? What would a specific, human paragraph about the donation drive look like?",
@@ -75,7 +75,7 @@ UNIT = {
         },
         {
             "num": "Part 3", "title": "Draft inside-out: STAR stories first",
-            "note": "The LLM seems to have drafted its content \"outside-in\": it started from cover-letter conventions and filled them with abstractions. You'll draft \"inside-out\": start from your two or three most interesting real experiences, write them as stories, and only then build the letter's structure around them. Use the STAR frame (Situation, Task, Action, Result) for each story.",
+            "note": "The LLM seems to have drafted its content \"outside-in\": it started from cover-letter conventions and filled them with abstractions. You'll draft \"inside-out\": start from your two or three most interesting real experiences, write them as stories, and only then build the letter's structure around them. Use the STAR structure (Situation -> Task(s) -> Action(s) -> Result(s)) for each story.",
             "blocks": [
                 {"type": "star", "id": "s1", "title": "Story 1", "fields": [
                     {"id": "s", "label": "Situation", "placeholder": "Where were you, and what was going on? Be pedestrian and specific: the workplace / course, the academic term, the project, the problem.", "hint": "e.g., \"Spring quarter, the café lost two closers in the same week and the schedule fell apart.\""},
